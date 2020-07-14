@@ -2,6 +2,7 @@ import { hash, compare } from 'bcryptjs';
 import { getRepository } from 'typeorm';
 import User from '../models/User';
 import { sign } from 'jsonwebtoken';
+import authConfig from '../config/auth'; 
 
  interface Request {
      email: string;
@@ -30,10 +31,11 @@ interface Response {
         if(!passwordMatched) {
             throw new Error ('Email ou senha incorreta!');
         }
-
-        const token = sign({}, '2593d40e8e21eada45123bf7a2a7b6b6', {
-            subject: user.id,
-            expiresIn: '1d' //deixe o usuário ser deslogado, após logar vai expirar depois de 1 dia
+        const { secret, expiresIn } = authConfig.jwt;
+        //não podemos colocar no 1º parâmetro dados confidênciais -> sign
+        const token = sign({}, secret, {
+            subject: user.id, //o subject será sempre o id do usuário
+            expiresIn, //deixe o usuário ser deslogado, após logar vai expirar depois de 1 dia
         });
 
         //Usuário autenticado
