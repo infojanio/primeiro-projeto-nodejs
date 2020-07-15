@@ -17,7 +17,7 @@ app.use(routes);
 //Temos que fazer a tratativa de erros após as rotas
 app.use((err:Error, request:Request, response:Response, next:NextFunction) => {
 if (err instanceof AppError) {
-    //retorna erro gerando dentro de nossa API
+    //retorna erro gerado dentro de nossa API
     return response.status(err.statusCode).json({
         status: 'error',
         message: err.message,
