@@ -2,6 +2,7 @@ import { hash } from 'bcryptjs';
 import { getRepository } from 'typeorm';
 
 import User from '../models/User';
+import AppError from '../errors/AppError';
 
 interface Request {
     name: string;
@@ -19,7 +20,7 @@ class CreateUserService {
     });
 
     if(checkUserExist) {
-        throw new Error('Atenção: Este email já está sendo usado!');     
+        throw new AppError('Atenção: Este email já está sendo usado!');     
     }
     const hashedPassword = await hash(password, 8); //cryptografa a senha do usuário
     const user = usersRepository.create({ //cria a instância

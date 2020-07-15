@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 
 import authConfig from '../config/auth';
+import AppError from '../errors/AppError';
 
 interface TokenPayLoad {
     iat: number;
@@ -16,7 +17,7 @@ export default function ensureAuthenticated (
         const authHeader = request.headers.authorization; //pega o token dentro do Header
 
         if(!authHeader) {
-            throw new Error ('JWT token não autenticado!');
+            throw new AppError ('JWT token não autenticado!', 401);
         }
 
         const [, token] = authHeader.split(' ');
@@ -33,6 +34,6 @@ export default function ensureAuthenticated (
         return next();
         } 
         catch {
-            throw new Error ('JWT Token inválido!');
+            throw new AppError ('JWT Token inválido!', 401);
         } 
 }

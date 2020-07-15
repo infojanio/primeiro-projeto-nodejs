@@ -1,8 +1,10 @@
 import { hash, compare } from 'bcryptjs';
 import { getRepository } from 'typeorm';
+
 import User from '../models/User';
 import { sign } from 'jsonwebtoken';
 import authConfig from '../config/auth'; 
+import AppError from '../errors/AppError';
 
  interface Request {
      email: string;
@@ -22,14 +24,14 @@ interface Response {
             where: {email} });
         
         if (!user) {
-            throw new Error('Email ou senha incorreta!');
+            throw new AppError('Email ou senha incorreta!', 401);
         }
         //user.password -> senha criptografada
         //password -> senha não criptografada
         const passwordMatched = await compare(password, user.password); //compare é um método que compara a senha com a criptografada
         
         if(!passwordMatched) {
-            throw new Error ('Email ou senha incorreta!');
+            throw new AppError ('Email ou senha incorreta!', 401);
         }
         const { secret, expiresIn } = authConfig.jwt;
         //não podemos colocar no 1º parâmetro dados confidênciais -> sign
