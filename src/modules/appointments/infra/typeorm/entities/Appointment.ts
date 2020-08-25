@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import User from './User';
+import User from '@modules/users/infra/typeorm/entities/User';
 /* Relacionamento entre tabelas
 Um para um (OneToOne) 
 Um para muitos (OneToMany)     
