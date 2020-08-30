@@ -1,25 +1,28 @@
 import { startOfHour } from 'date-fns';
-import { getCustomRepository } from 'typeorm';
+import { injectable, inject } from 'tsyringe';
 import AppError from '@shared/errors/AppError';
 import Appointment from '../infra/typeorm/entities/Appointment';
-import AppointmentsRepository from '../infra/typeorm/repositories/AppointmentsRepository';
+import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
 
-interface Request {
+interface IRequest {
   provider_id: string;
   date: Date;
 }
-
+// todo service possui um único método
+@injectable() // usamos em toda classe que recebe injeção de dependências
 class CreateAppointmentService {
-  // todo service possui um único método
-  // Toda vez que temos uma função async retornamos uma Promise
-  public async execute({ date, provider_id }: Request): Promise<Appointment> {
-    // Recebimento de informações
+  constructor(
+    @inject('IAppointmentsRepository')
+    private appointmentsRepository: IAppointmentsRepository,
+  ) {}
 
-    const appointmentsRepository = getCustomRepository(AppointmentsRepository); // Essa variável dará acesso a todos os métodos da classe
+  // Toda vez que temos uma função async retornamos uma Promise
+  public async execute({ date, provider_id }: IRequest): Promise<Appointment> {
+    // Recebimento de informações
 
     const appointmentDate = startOfHour(date); // converte em horas inteiras, ex: 20:00:00 zera minuto e segundo
 
-    const findAppointmentInSameDate = await appointmentsRepository.findByDate(
+    const findAppointmentInSameDate = await this.appointmentsRepository.findByDate(
       appointmentDate,
     ); // se tiver agendamento na mesma data
 
@@ -28,12 +31,10 @@ class CreateAppointmentService {
       throw new AppError('O horário já foi agendado!'); // o service não usa request e response,
     }
 
-    const appointment = appointmentsRepository.create({
-      // cria uma instância
+    const appointment = await this.appointmentsRepository.create({
       provider_id,
       date: appointmentDate,
     });
-    await appointmentsRepository.save(appointment); // salva no banco de dados
 
     return appointment;
   }
