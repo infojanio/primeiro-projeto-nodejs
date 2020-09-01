@@ -4,6 +4,7 @@ import { injectable, inject } from 'tsyringe';
 
 import uploadConfig from '@config/upload';
 import AppError from '@shared/errors/AppError';
+import IStorageProvider from '@shared/container/providers/StorageProvider/models/IStorageProvider';
 import User from '../infra/typeorm/entities/User';
 import IUsersRepository from '../repositories/IUsersRepository';
 
@@ -17,6 +18,9 @@ class UpdateUserAvatarService {
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
+
+    @inject('StorageProvider')
+    private storageProvider: IStorageProvider,
   ) {}
 
   public async execute({ user_id, avatarFilename }: IRequest): Promise<User> {
@@ -25,16 +29,15 @@ class UpdateUserAvatarService {
     if (!user) {
       throw new AppError('Só usuários autenticados podem mudar o avatar!', 401); // 401 serve p/ indicar que falta autenticação
     }
+    // trocando o avatar do usuário
     if (user.avatar) {
       // deleta avatar anterior, p/ não encher o banco de dados
-      const userAvatarFilePath = path.join(uploadConfig.directory, user.avatar);
-      const userAvatarFileExists = await fs.promises.stat(userAvatarFilePath); // stat tras o status
-
-      if (userAvatarFileExists) {
-        await fs.promises.unlink(userAvatarFilePath); // deleta o avatar
-      }
+      await this.storageProvider.deleteFile(user.avatar);
     }
-    user.avatar = avatarFilename;
+
+    const filename = await this.storageProvider.saveFile(avatarFilename);
+
+    user.avatar = filename;
     await this.usersRepository.save(user); // atualiza o avatar, a função save serve tb para atualização
     return user;
   }
