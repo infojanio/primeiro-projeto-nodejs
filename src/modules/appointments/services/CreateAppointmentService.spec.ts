@@ -34,7 +34,7 @@ describe('CreateAppointment', () => {
     });
 
     // Testa se o 2º agendamento vai resultar em erro
-    expect(
+    await expect(
       createAppointment.execute({
         date: new Date(),
         provider_id: '123123',

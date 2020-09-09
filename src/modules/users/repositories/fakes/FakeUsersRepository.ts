@@ -4,7 +4,7 @@ import IUsersRepository from '@modules/users/repositories/IUsersRepository';
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
 import User from '../../infra/typeorm/entities/User';
 
-class UsersRepository implements IUsersRepository {
+class FakeUsersRepository implements IUsersRepository {
   private users: User[] = []; // criação de array de usuários, vazio
 
   // método encontrar usuário por id
@@ -37,4 +37,4 @@ class UsersRepository implements IUsersRepository {
     return user;
   }
 }
-export default UsersRepository;
+export default FakeUsersRepository;
