@@ -15,7 +15,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use('/files', express.static(uploadConfig.directory)); // rota para mostrar o avatar
+app.use('/files', express.static(uploadConfig.uploadsFolder)); // rota para mostrar o avatar
 app.use(routes);
 
 // Temos que fazer a tratativa de erros após as rotas

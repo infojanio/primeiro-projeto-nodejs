@@ -3,18 +3,26 @@ import FakeStorageProvider from '@shared/container/providers/StorageProvider/fak
 import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
 import UpdateUserAvatarService from './UpdateUserAvatarService';
 
-// Teste verifica se o usuário foi criado
-describe('UpdateUserAvatar', () => {
-  // Testa se isso deve permitir criar novo agendamento
-  it('should be able to create a new user', async () => {
-    const fakeUsersRepository = new FakeUsersRepository(); // criação de repositorio fake
-    const fakeStorageProvider = new FakeStorageProvider();
+let fakeUsersRepository: FakeUsersRepository; // criação de repositorio fake
+let fakeStorageProvider: FakeStorageProvider;
+let updateUserAvatar: UpdateUserAvatarService;
 
-    const updateUserAvatar = new UpdateUserAvatarService(
+// Teste
+
+// verifica se o usuário foi criado
+describe('UpdateUserAvatar', () => {
+  beforeEach(() => {
+    fakeUsersRepository = new FakeUsersRepository(); // criação de repositorio fake
+    fakeStorageProvider = new FakeStorageProvider();
+
+    updateUserAvatar = new UpdateUserAvatarService(
       fakeUsersRepository,
       fakeStorageProvider, // salvamos na memória
     );
+  });
 
+  // Testa se isso deve permitir criar novo agendamento
+  it('should be able to create a new user', async () => {
     const user = await fakeUsersRepository.create({
       name: 'Fulano John Doe',
       email: 'teste@teste.com.br',
@@ -31,14 +39,6 @@ describe('UpdateUserAvatar', () => {
 
   // testa se usuário existe para que atualize o avatar
   it('should not be able to update avatar from non existing user', async () => {
-    const fakeUsersRepository = new FakeUsersRepository(); // criação de repositorio fake
-    const fakeStorageProvider = new FakeStorageProvider();
-
-    const updateUserAvatar = new UpdateUserAvatarService(
-      fakeUsersRepository,
-      fakeStorageProvider, // salvamos na memória
-    );
-
     await expect(
       updateUserAvatar.execute({
         user_id: 'non-existing-user',
@@ -49,17 +49,8 @@ describe('UpdateUserAvatar', () => {
 
   // Deve testar se vai deletar o avatar antigo quando atualizado um novo
   it('should delete old avatar when updating new one', async () => {
-    const fakeUsersRepository = new FakeUsersRepository(); // criação de repositorio fake
-    const fakeStorageProvider = new FakeStorageProvider();
-
     // spyOn é uma função de espionagem, ele verifica se algum método foi disparado
     const deleteFile = jest.spyOn(fakeStorageProvider, 'deleteFile');
-
-    const updateUserAvatar = new UpdateUserAvatarService(
-      fakeUsersRepository,
-      fakeStorageProvider, // salvamos na memória
-    );
-
     const user = await fakeUsersRepository.create({
       name: 'Fulano John Doe',
       email: 'teste@teste.com.br',
