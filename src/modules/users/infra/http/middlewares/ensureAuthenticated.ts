@@ -4,7 +4,7 @@ import { verify } from 'jsonwebtoken';
 import authConfig from '@config/auth';
 import AppError from '@shared/errors/AppError';
 
-interface TokenPayLoad {
+interface ITokenPayLoad {
   iat: number;
   exp: number;
   sub: string;
@@ -26,7 +26,7 @@ export default function ensureAuthenticated(
     const decoded = verify(token, authConfig.jwt.secret);
 
     // pega o id de usuário para ser usado em todas as rotas autenticadas
-    const { sub } = decoded as TokenPayLoad; // forçando a variável p/ o tipo TokenPayLoad
+    const { sub } = decoded as ITokenPayLoad; // forçando a variável p/ o tipo TokenPayLoad
     request.user = {
       // precisamos subscrever na lib express o user
       id: sub,
