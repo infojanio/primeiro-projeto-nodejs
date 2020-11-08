@@ -1,11 +1,14 @@
 import 'reflect-metadata';
+import 'dotenv/config';
 import cors from 'cors';
+import { errors } from 'celebrate';
 
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
 
 import uploadConfig from '@config/upload';
 import AppError from '@shared/errors/AppError';
+import rateLimiter from './middlewares/rateLimiter';
 import routes from './routes';
 
 import '@shared/infra/typeorm';
@@ -16,7 +19,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/files', express.static(uploadConfig.uploadsFolder)); // rota para mostrar o avatar
+
+app.use(rateLimiter); // limita qtd requisições das rotas que vem abaixo
 app.use(routes);
+
+app.use(errors()); // mostra erros ocorridos na validação das rotas
 
 // Temos que fazer a tratativa de erros após as rotas
 app.use(

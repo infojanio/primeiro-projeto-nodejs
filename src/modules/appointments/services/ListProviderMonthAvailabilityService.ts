@@ -1,6 +1,7 @@
 import { injectable, inject } from 'tsyringe';
-import { getDaysInMonth, getDate } from 'date-fns'; // retorna quantos dias tem no mês
+import { getDaysInMonth, getDate, isAfter } from 'date-fns'; // retorna quantos dias tem no mês
 
+import { is } from 'date-fns/locale';
 import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
 
 // import User from '@modules/users/infra/typeorm/entities/User';
@@ -46,13 +47,17 @@ class ListProviderMonthAvailabilityService {
 
     // verifica se tem algum agendamento neste dia específico
     const availability = eachDayArray.map(day => {
+      const compareDate = new Date(year, month - 1, day, 23, 59, 59); // deixa apenas o dia atual disponível
+
       const appointmentsInDay = appointments.filter(appointment => {
         return getDate(appointment.date) === day;
       });
 
       return {
         day,
-        available: appointmentsInDay.length < 10, // agendamento de 8 às 17, então são 10 por dia
+        // compara se o dia atual já ultrapassou 13:59 e agendamento de 8 às 17, então são 10 por dia
+        available:
+          isAfter(compareDate, new Date()) && appointmentsInDay.length < 10,
       };
     });
 

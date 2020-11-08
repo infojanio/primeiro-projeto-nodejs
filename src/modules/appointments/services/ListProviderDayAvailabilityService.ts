@@ -47,13 +47,14 @@ class ListProviderDayAvailabilityService {
       (_, index) => index + hourStart, // percorre o array, e começa as 8h
     );
 
+    const currentDate = new Date(Date.now()); // data atual
+
     const availability = eachHourArray.map(hour => {
       // verifica se tem agendamento p/ esta hora
       const hasAppointmentInHour = appointments.find(
         appointment => getHours(appointment.date) === hour,
       );
 
-      const currentDate = new Date(Date.now()); // data atual
       const compareDate = new Date(year, month - 1, day, hour); // data de agora - 2020-09-17 08:00:00
 
       return {

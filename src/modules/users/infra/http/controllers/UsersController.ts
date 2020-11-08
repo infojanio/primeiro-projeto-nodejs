@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { container } from 'tsyringe';
 import CreateUserService from '@modules/users/services/CreateUserService';
+import { classToClass } from 'class-transformer';
 
 // controllers devem possuir no máximo 5 métodos(show, create, delete, index, update)
 export default class UsersController {
@@ -9,12 +10,13 @@ export default class UsersController {
 
     // Cria a instancia
     const createUser = container.resolve(CreateUserService);
+
     const user = await createUser.execute({
       name,
       email,
       password,
     });
     delete user.password; // deleta a senha da rota de usuário, por segurança
-    return response.json(user);
+    return response.json(classToClass(user));
   }
 }

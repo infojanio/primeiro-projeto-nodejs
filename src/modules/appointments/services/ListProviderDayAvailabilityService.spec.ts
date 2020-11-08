@@ -21,16 +21,19 @@ describe('ListProviderDayAvailability', () => {
   it('should be able to list the day availability from provider', async () => {
     await fakeAppointmentsRepository.create({
       provider_id: 'user',
+      user_id: 'user', // conferir
+
       date: new Date(2020, 4, 20, 14, 0, 0), // 20-05-2020 14:00:00  após as 11h horário atual
     });
 
     await fakeAppointmentsRepository.create({
       provider_id: 'user',
+      user_id: 'user', // conferir
       date: new Date(2020, 4, 20, 15, 0, 0), // 20-05-2020 15:00:00  após as 11h horário atual
     });
 
-    jest.spyOn(Date, 'now').mockImplementation(() => {
-      return new Date(2020, 4, 20, 11).getTime(); // 2020-5-20 11:00:00
+    jest.spyOn(Date, 'now').mockImplementationOnce(() => {
+      return new Date(2020, 4, 20, 11).getTime(); // Estou dizendo que agora são 2020-9-22 11:00:00
     });
 
     const availability = await listProviderDayAvailability.execute({

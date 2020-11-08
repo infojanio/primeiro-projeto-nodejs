@@ -1,15 +1,30 @@
 import { Router } from 'express';
+import { celebrate, Segments, Joi } from 'celebrate'; // pacote faz validade de route params, query params, body
 
-import AppointmentsRepository from '@modules/appointments/infra/typeorm/repositories/AppointmentsRepository';
-import CreateAppointmentService from '@modules/appointments/services/CreateAppointmentService';
 import ensureAuthenticated from '@modules/users/infra/http/middlewares/ensureAuthenticated';
 import AppointmentsController from '../controllers/AppointmentsController';
+import ProviderAppointmentsController from '../controllers/ProviderAppointmentsControllers';
 
 const appointmentsRouter = Router();
 const appointmentsController = new AppointmentsController();
+const providerAppointmentsController = new ProviderAppointmentsController();
 
-appointmentsRouter.use(ensureAuthenticated); // consulta se o token é válido em todas as rotas
+// consulta se o token é válido em todas as rotas
+appointmentsRouter.use(ensureAuthenticated);
 
-appointmentsRouter.post('/', appointmentsController.create);
+// criação de agendamentos
+appointmentsRouter.post(
+  '/',
+  celebrate({
+    [Segments.BODY]: {
+      provider_id: Joi.string().uuid().required(),
+      date: Joi.date(),
+    },
+  }),
+  appointmentsController.create,
+);
+
+// provider logado consulta agendamentos por dia
+appointmentsRouter.get('/me', providerAppointmentsController.index);
 
 export default appointmentsRouter;

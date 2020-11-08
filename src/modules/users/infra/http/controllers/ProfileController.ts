@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { container } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import UpdateProfileService from '@modules/users/services/UpdateProfileService';
 import ShowProfileService from '@modules/users/services/ShowProfileService';
@@ -12,8 +13,8 @@ export default class ProfileController {
 
     const showProfile = container.resolve(ShowProfileService);
     const user = await showProfile.execute({ user_id });
-    delete user.password; // não mostrar a senha na rota
-    return response.json(user);
+    // delete user.password; // não mostrar a senha na rota
+    return response.json(classToClass(user)); // não mostrar a senha na rota e mostra a url do avatar
   }
 
   // rota para atualizar os dados do perfil
@@ -31,7 +32,7 @@ export default class ProfileController {
       old_password,
       password,
     });
-    delete user.password; // deleta a senha da rota de usuário, por segurança
-    return response.json(user);
+    // delete user.password; // deleta a senha da rota de usuário, por segurança
+    return response.json(classToClass(user));
   }
 }

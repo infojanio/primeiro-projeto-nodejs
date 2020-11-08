@@ -13,9 +13,14 @@ class AppointmentsRepository implements IAppointmentsRepository {
   private appointments: Appointment[] = [];
 
   // encontrar agendamento por data
-  public async findByDate(date: Date): Promise<Appointment | undefined> {
+  public async findByDate(
+    date: Date,
+    provider_id: string,
+  ): Promise<Appointment | undefined> {
     const findAppointment = this.appointments.find(
-      appointment => isEqual(appointment.date, date), // verifica se as datas são iguais
+      appointment =>
+        isEqual(appointment.date, date) &&
+        appointment.provider_id === provider_id, // verifica se as datas são iguais
     );
     return findAppointment;
   }
@@ -55,11 +60,12 @@ class AppointmentsRepository implements IAppointmentsRepository {
   // teste criaçao de agendamento
   public async create({
     provider_id,
+    user_id,
     date,
   }: ICreateAppointmentDTO): Promise<Appointment> {
     const appointment = new Appointment();
 
-    Object.assign(appointment, { id: uuid(), date, provider_id });
+    Object.assign(appointment, { id: uuid(), date, provider_id, user_id });
 
     this.appointments.push(appointment);
     return appointment;

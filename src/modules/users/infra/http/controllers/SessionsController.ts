@@ -1,5 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { container } from 'tsyringe';
+import { classToClass } from 'class-transformer';
+
 import AuthenticateUserService from '@modules/users/services/AuthenticateUserService';
 
 // controllers devem possuir no máximo 5 métodos(show, create, delete, index, update)
@@ -13,8 +15,8 @@ export default class SessionsController {
       email,
       password,
     });
-    delete user.password; // exclui a senha do retorno
+    // delete user.password; // exclui a senha do retorno
 
-    return response.json({ user, token });
+    return response.json({ user: classToClass(user), token }); // classToClass faz com que  @Exclude() e @Expose do User.ts funcione
   }
 }

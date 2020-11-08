@@ -14,10 +14,13 @@ class AppointmentsRepository implements IAppointmentsRepository {
     this.ormRepository = getRepository(Appointment);
   }
 
-  public async findByDate(date: Date): Promise<Appointment | undefined> {
+  public async findByDate(
+    date: Date,
+    provider_id: string,
+  ): Promise<Appointment | undefined> {
     // verificar se horário está disponível, se já tem o mesmo horário marcado
     const findAppointment = await this.ormRepository.findOne({
-      where: { date }, // encontra os agendamentos where data, caso já exista retornará null
+      where: { date, provider_id }, // encontra os agendamentos where data, caso já exista retornará null
     });
 
     return findAppointment;
@@ -61,15 +64,22 @@ class AppointmentsRepository implements IAppointmentsRepository {
             `to_char(${dateFieldName}, 'DD-MM-YYYY') = '${parsedDay}-${parsedMonth}-${year}'`, // converte outro tipo p/ string no Postgres
         ),
       },
+      relations: ['user'], // Eager loading
     });
+    console.log(appointments);
     return appointments;
   }
 
   public async create({
     provider_id,
+    user_id,
     date,
   }: ICreateAppointmentDTO): Promise<Appointment> {
-    const appointment = this.ormRepository.create({ provider_id, date }); // cria uma instância
+    const appointment = this.ormRepository.create({
+      provider_id,
+      user_id,
+      date,
+    }); // cria uma instância
 
     await this.ormRepository.save(appointment); // salva no banco de dados
 

@@ -1,5 +1,7 @@
 import { container } from 'tsyringe';
 
+import './CacheProvider'; // conferir e consertar este index
+
 import IStorageProvider from './StorageProvider/models/IStorageProvider';
 import DiskStorageProvider from './StorageProvider/implementations/DiskStorageProvider';
 
